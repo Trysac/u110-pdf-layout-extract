@@ -2,18 +2,12 @@
 
 ## Threat model
 
-`trysac-pdf-layout-extract` is a pure library without I/O. The main risks are:
+`pdf-layout-extract` operates as a pure library without I/O or external dependencies.
 
-- **Supply chain**: a compromised dependency or CI action. Mitigation: no runtime dependencies,
-  Dependabot weekly updates, actions pinned to major versions, minimal workflow permissions.
-- **Leaked secrets**: tokens committed by mistake. Mitigation: `gitleaks` runs in the local gates
-  and in CI; `.env` files are git-ignored.
-- **Untrusted input**: callers may pass hostile strings. Mitigation: validate input and fail with
-  explicit exceptions; never `eval`, `exec` or deserialize untrusted data.
+- **Defended**:
+  - **Input Validation**: The library strictly validates input coordinates (NaN/infinite checks, geometric ordering) and object structures. All `LayoutError` exceptions explicitly sanitize messages to length 200 to prevent buffer-related risks.
+  - **Execution**: The library does not use `eval`, `exec`, or unsafe deserialization.
 
-## Publishing
-
-Releases are published to PyPI with trusted publishing (OIDC) when available, never with a
-long-lived token stored in the repository.
-
-To report a vulnerability, see [SECURITY.md](../SECURITY.md).
+- **Not defended**:
+  - **Algorithmic Complexity**: Extremely pathological inputs (e.g., $10^6$ overlapping boxes) are limited by `max_words` and `max_depth` to prevent resource exhaustion.
+  - **Data Privacy**: The library processes provided in-memory text; it assumes the caller has authorization to process the input strings.

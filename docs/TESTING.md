@@ -1,20 +1,15 @@
 # Testing
 
-## Running
+Tests cover acceptance criteria, edge cases, input validation, and the CLI.
 
-```sh
-uv run pytest --cov=pdf_layout_extract   # tests with coverage report
-uv run python scripts/check.py      # every gate, as CI and the factory run it
-```
+## File structure
 
-## Policy
+- `tests/test_pdf_layout_extract.py`: Contains test cases mapping to the specification requirements:
+  - `test_acceptance_1_simple_words_reading_order`: Validates simple paragraph ordering.
+  - `test_acceptance_2_heading_and_two_columns`: Validates recursive XY-cut column splitting.
+  - `test_acceptance_3_hyphenation_joining`: Validates the hyphenation join rule.
+  - `test_acceptance_4_table_detection`: Validates the table detection rule for aligned columns.
+  - `test_acceptance_5_words_from_dicts_and_validation`: Validates input dictionary conversion and `LayoutError` trigger conditions (NaNs, geometric constraint violations).
+  - `test_cli`: Validates `main()` entry point with valid and invalid JSON inputs.
 
-- Branch coverage of `src/pdf_layout_extract` must stay at or above 80 %; the gate fails below it.
-- Tests exercise the public API (`import pdf_layout_extract`) and assert every observable effect:
-  return values, raised exceptions and their messages.
-- Each bug fix starts with a failing test that reproduces it.
-- Tests are deterministic: no network, no wall clock, no dependence on test order.
-
-## Layout
-
-`tests/test_<module>.py` mirrors each public module. Shared fixtures go in `tests/conftest.py`.
+Tests are deterministic, relying on `random.Random(7)` for shuffling tests to confirm that input word order never affects the output.

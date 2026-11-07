@@ -19,6 +19,9 @@ classifiers = [
 ]
 dependencies = []
 
+[project.scripts]
+pdf-layout-extract = "pdf_layout_extract.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/Trysac/u110-pdf-layout-extract"
 Source = "https://github.com/Trysac/u110-pdf-layout-extract"
