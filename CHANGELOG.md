@@ -9,4 +9,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Add recursive XY-cut layout extraction, table detection, hyphenation healing, and CLI.
 - Initial project structure from the factory utility template.

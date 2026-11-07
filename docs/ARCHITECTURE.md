@@ -1,29 +1,17 @@
 # Architecture
 
-## Purpose
+`pdf_layout_extract` implements a recursive XY-cut layout analysis algorithm for reconstructing reading order from positioned words without external PDF parsing dependencies.
 
-`trysac-pdf-layout-extract` is a small, dependency-free Python library: Reading-order text from positioned PDF words: recursive XY-cut for columns, three-column-plus aligned regions as tables, hyphen joins, input shaped like pdfplumber words
+## Pipeline
 
-## Shape
+1. **Input Normalization & Validation**:
+   `words_from_dicts` or direct instantiation of `Word` validates coordinate finiteness, ordering ($x_1 \ge x_0$, $\text{bottom} \ge \text{top}$), and non-empty text strings.
 
-```text
-caller code --> pdf_layout_extract (public API in __init__.py)
-                    |
-                    +-- pure functions, no I/O, no global state
-```
+2. **Recursive XY-cut Decomposition**:
+   - **Vertical Cut First**: Words are projected onto the horizontal axis ($x$-intervals). Empty gaps $\ge \text{column\_gap}$ partition words into left-to-right columns.
+   - **Table Detection Rule**: If a vertical cut produces 3 or more children, all of which are leaf nodes having the same number of lines ($\\ge 2$) with matching line tops within $2.0\,\text{pt}$, the partition is constructed as a structured `table` block.
+   - **Horizontal Cut Second**: When no vertical cut applies, empty vertical gaps $\ge \text{row\_gap}$ (defaulting to median word height) partition words from top to bottom.
+   - **Leaf Nodes & Paragraph Formation**: When neither cut applies or `max_depth` (default 32) is reached, words are clustered into lines based on vertical center overlap, sorted horizontally, and processed for hyphen continuation joins.
 
-- **Public API**: the names listed in `__all__` of `src/pdf_layout_extract/__init__.py`. Anything else is
-  internal and may change without a major version.
-- **Errors**: invalid input raises built-in exceptions (`ValueError`, `TypeError`) with a clear
-  message; the library never prints or exits.
-- **Side effects**: none. If a feature needs I/O, isolate it in its own module behind a small
-  interface and record the choice in an ADR.
-
-## Quality contract
-
-`scripts/check.py` is the single definition of the gates; `fabrica.json` tells the factory and CI
-how to run it. See [TESTING.md](TESTING.md).
-
-## Decisions
-
-Architecture decisions are recorded in [decisions/](decisions/) as numbered ADRs.
+3. **Deterministic Rendering**:
+   `to_text` joins paragraphs with newlines, table cells with ` | `, blocks with `\n\n`, and pages with `\n\f\n`.
