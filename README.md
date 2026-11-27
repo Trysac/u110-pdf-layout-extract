@@ -8,8 +8,10 @@ Plain PDF text extraction interleaves the lines of two columns, flattens tables 
 
 ## Installation
 
+Not published to PyPI yet. Install it from GitHub:
+
 ```bash
-pip install pdf-layout-extract
+pip install "git+https://github.com/Trysac/u110-pdf-layout-extract"
 ```
 
 ## Usage
